@@ -1,0 +1,33 @@
+// prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Teacher {
+  id            String     @id @default(cuid())
+  full_name     String
+  plate_number  String     @unique
+  status        String     @default("active") // active, inactive
+  car_model_brand String?
+  face_encoding String?    // optional base64 or url
+  logs          EntryLog[]
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+}
+
+model EntryLog {
+  id           String    @id @default(cuid())
+  teacher_id   String?
+  teacher      Teacher?  @relation(fields: [teacher_id], references: [id])
+  plate_number String
+  date         DateTime  @default(now())
+  entry_time   DateTime?
+  exit_time    DateTime?
+  status       String    // success, failed
+  match_type   String    // plate, face, manual
+}
